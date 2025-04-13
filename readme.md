@@ -1,7 +1,9 @@
-# Project - 1
-
-Working currently
+# AppDev - Android application
 
 # # Programming language
 
 Python 3
+
+# # Platform
+
+Android studio
