@@ -6,16 +6,19 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_logo_default"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_logo_default"
         android:supportsRtl="true"
         android:theme="@style/Theme.Schöne"
         tools:targetApi="31">
+
+        <!-- Login Activity -->
         <activity
             android:name=".ui.login.LoginActivity"
             android:exported="false"
             android:label="@string/title_activity_login" />
+
         <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
@@ -23,37 +26,58 @@
             android:theme="@style/Theme.Schöne">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- Activity Alias for Default Icon -->
         <activity-alias
-            android:name=".Icon2"
-            android:enabled="false"
+            android:name=".IconDefault"
+            android:enabled="true"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_round"
+            android:icon="@mipmap/ic_logo_default"
             android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_logo_default"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias> <!-- Activity Alias for Custom Icons -->
+
+        <!-- Activity Alias for Male Icon -->
         <activity-alias
-            android:name=".Icon1"
+            android:name=".IconMale"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_round"
+            android:icon="@mipmap/ic_logo_male"
             android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_logo_male"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
+
+        <!-- Activity Alias for Female Icon -->
+        <activity-alias
+            android:name=".IconFemale"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_logo_female"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_logo_female"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+
+
+
     </application>
 
 </manifest>

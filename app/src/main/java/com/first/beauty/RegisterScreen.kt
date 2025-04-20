@@ -3,10 +3,10 @@ package com.first.beauty
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
+import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,19 +16,13 @@ import androidx.compose.foundation.layout.padding
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Button
 //noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.DropdownMenu
 //noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.Icon
 //noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.IconButton
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.MaterialTheme
 //noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.OutlinedTextField
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,13 +38,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 
+@SuppressLint("UseKtx")
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -67,6 +59,7 @@ fun RegisterScreen(navController: NavController) {
     val genderOptions = listOf("Male", "Female", "Other", "Prefer not to say")
     var selectedGender by remember { mutableStateOf(genderOptions[0]) }
     var expanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -174,6 +167,7 @@ fun RegisterScreen(navController: NavController) {
                         onClick = {
                             selectedGender = gender
                             expanded = false
+
                         }
                     )
                 }
@@ -200,9 +194,15 @@ fun RegisterScreen(navController: NavController) {
                 if (name.isEmpty() || username.isEmpty() || password.isEmpty() || country.isEmpty() || dob.isEmpty()) {
                     errorMessage = "Please fill in all the fields."
                 } else {
-                    // Perform registration logic
                     errorMessage = ""  // Reset error
-                    // Navigate to next screen or handle registration
+
+                    setLauncherIcon(context, selectedGender)
+
+                    // Optionally save gender in SharedPreferences for reuse
+                    context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+                        .edit().putString("gender", selectedGender).apply()
+                    // Navigate or do further logic
+                    navController.navigate("home")
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -218,8 +218,6 @@ fun RegisterScreen(navController: NavController) {
         }
     }
 }
-
-
 
 // Preview for Register Composable
 @RequiresApi(Build.VERSION_CODES.O)

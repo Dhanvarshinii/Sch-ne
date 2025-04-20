@@ -1,4 +1,8 @@
 package com.first.beauty
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -106,6 +110,36 @@ fun BottomNavBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
         )
     }
 }
+
+fun setLauncherIcon(context: Context, gender: String) {
+    val packageManager = context.packageManager
+    val default = ComponentName(context, "com.first.beauty.MainActivity")
+    val male = ComponentName(context, "com.first.beauty.Icon1") // e.g., for Male
+    val female = ComponentName(context, "com.first.beauty.Icon2") // e.g., for Female
+
+    // Disable all first
+    packageManager.setComponentEnabledSetting(default, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+    packageManager.setComponentEnabledSetting(male, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+    packageManager.setComponentEnabledSetting(female, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+
+    // Enable one based on gender
+    val selected = when (gender.lowercase()) {
+        "male" -> male
+        "female" -> female
+        else -> default
+    }
+
+    packageManager.setComponentEnabledSetting(selected, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+
+    // Relaunch the launcher icon
+    val intent = Intent(Intent.ACTION_MAIN).apply {
+        addCategory(Intent.CATEGORY_HOME)
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+    context.startActivity(intent)
+}
+
+
 
 
 @RequiresApi(Build.VERSION_CODES.O)

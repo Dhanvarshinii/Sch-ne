@@ -1,5 +1,7 @@
 package com.first.beauty
 
+import android.content.Context
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,6 +39,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -53,16 +56,22 @@ fun LoginScreen(navController: NavController, onLoginSuccess: () -> Unit) {
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-
-
     // Get the context using LocalContext
     val context = LocalContext.current
     val loginViewModel: LoginViewModel = viewModel(
         factory = LoginViewModelFactory(context)
     )
 
-    // Create an instance of LoginRepository with the context
-    val loginRepository = remember { LoginRepository(LoginDataSource(context)) }
+    // Get the gender from SharedPreferences to determine the logo
+    val sharedPref = context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
+    val gender = sharedPref.getString("gender", "neutral") // Default to "neutral"
+
+    // Select the logo based on gender
+    val logoRes = when (gender) {
+        "male" -> R.drawable.ic_logo_male  // male logo
+        "female" -> R.drawable.ic_logo_female  // female logo
+        else -> R.drawable.ic_logo_default  // Default or neutral logo
+    }
 
     // Observe login result
     LaunchedEffect(loginViewModel.loginResult) {
@@ -82,6 +91,13 @@ fun LoginScreen(navController: NavController, onLoginSuccess: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Display the logo based on gender
+        Image(
+            painter = painterResource(id = logoRes),
+            contentDescription = "App Logo",
+            modifier = Modifier.height(120.dp) // Adjust size as necessary
+        )
+
         Text("Welcome Back!", style = MaterialTheme.typography.h4)
 
         Spacer(modifier = Modifier.height(16.dp))
