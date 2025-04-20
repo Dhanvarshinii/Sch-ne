@@ -37,22 +37,15 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     val navController = rememberNavController()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
+
     var selectedTab by remember { mutableIntStateOf(0) }
-    var showBottomBar by remember { mutableStateOf(true) }
-
-    // Observe changes in the navigation destination
-    val currentDestination by navController.currentBackStackEntryAsState()
-
-    // Determine whether to show the bottom bar or not based on the current destination
-    LaunchedEffect(currentDestination) {
-        val route = currentDestination?.destination?.route
-        showBottomBar = route != "login" && route != "register" // Hide bottom nav on login and register
-    }
-
 
     Scaffold(
         bottomBar = {
-            if (selectedTab != -1) { // Hide bottom bar on login/register pages
+            // Only show bottom bar for these routes
+            if (currentRoute in listOf("home", "routine", "concerns", "challenges")) {
                 BottomNavBar(selectedTab) { selectedTab = it }
             }
         }

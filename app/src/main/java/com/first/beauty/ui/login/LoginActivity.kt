@@ -13,10 +13,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import com.first.beauty.databinding.ActivityLoginBinding
-import com.first.beauty.data.LoginRepository
-import com.first.beauty.data.LoginDataSource
 import com.first.beauty.R
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class LoginActivity : AppCompatActivity() {
 
