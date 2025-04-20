@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 //Don't change this
@@ -37,6 +38,17 @@ class MainActivity : ComponentActivity() {
 fun MyApp() {
     val navController = rememberNavController()
     var selectedTab by remember { mutableIntStateOf(0) }
+    var showBottomBar by remember { mutableStateOf(true) }
+
+    // Observe changes in the navigation destination
+    val currentDestination by navController.currentBackStackEntryAsState()
+
+    // Determine whether to show the bottom bar or not based on the current destination
+    LaunchedEffect(currentDestination) {
+        val route = currentDestination?.destination?.route
+        showBottomBar = route != "login" && route != "register" // Hide bottom nav on login and register
+    }
+
 
     Scaffold(
         bottomBar = {
@@ -53,7 +65,9 @@ fun MyApp() {
             NavHost(navController = navController, startDestination = "login") {
                 composable("login") {
                     LoginScreen(navController) {
-                        navController.navigate("home")  // Navigate to home after successful login
+                        navController.navigate("home"){
+                            popUpTo("login") { inclusive = true }
+                        }  // Navigate to home after successful login
                     }
                 }
                 composable("register") { RegisterScreen(navController) }

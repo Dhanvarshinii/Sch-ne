@@ -13,8 +13,10 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import com.first.beauty.databinding.ActivityLoginBinding
-
+import com.first.beauty.data.LoginRepository
+import com.first.beauty.data.LoginDataSource
 import com.first.beauty.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class LoginActivity : AppCompatActivity() {
 
@@ -32,8 +34,11 @@ class LoginActivity : AppCompatActivity() {
         val login = binding.login
         val loading = binding.loading
 
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
+        // Pass the context to LoginViewModelFactory
+        loginViewModel = ViewModelProvider(
+            this, // Activity context
+            LoginViewModelFactory(applicationContext) // Pass the context to factory
+        ).get(LoginViewModel::class.java)
 
         loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
             val loginState = it ?: return@Observer
