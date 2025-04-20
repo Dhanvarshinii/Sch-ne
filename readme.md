@@ -1,8 +1,8 @@
-# AppDev - Android application
+# Schöne - Android application
 
 # # Programming language
 
-Python 3
+Python 3, Kotlin, Java
 
 # # Platform
 
