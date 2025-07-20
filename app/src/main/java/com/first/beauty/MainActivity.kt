@@ -1,4 +1,5 @@
 package com.first.beauty
+
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -19,12 +20,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.first.beauty.ui.login.*
+import com.first.beauty.data.model.LoggedInUserView
+
+
+
+
 
 //Don't change this
 class MainActivity : ComponentActivity() {
@@ -41,6 +49,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     val navController = rememberNavController()
+    var userGender by remember { mutableStateOf("default") } // initial default
+    val context = LocalContext.current // ✅ This is safe, since we're inside a @Composable
+
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
 
@@ -61,11 +72,24 @@ fun MyApp() {
         ) {
             NavHost(navController = navController, startDestination = "login") {
                 composable("login") {
-                    LoginScreen(navController) {
-                        navController.navigate("home"){
-                            popUpTo("login") { inclusive = true }
-                        }  // Navigate to home after successful login
-                    }
+                    LoginScreen(
+                        navController = navController,
+                        onLoginSuccess = { user: LoggedInUserView ->
+                            // Update the outer state
+                            userGender = user.gender
+
+                            // Set launcher icon dynamically here
+                            setLauncherIcon(context, userGender)
+
+                            navController.navigate("home") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        },
+
+                                onRegisterClick = {
+                            navController.navigate("register")
+                        }
+                    )
                 }
                 composable("register") { RegisterScreen(navController) }
                 composable("home") { HomeScreen() }
@@ -113,9 +137,9 @@ fun BottomNavBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
 
 fun setLauncherIcon(context: Context, gender: String) {
     val packageManager = context.packageManager
-    val default = ComponentName(context, "com.first.beauty.MainActivity")
-    val male = ComponentName(context, "com.first.beauty.Icon1") // e.g., for Male
-    val female = ComponentName(context, "com.first.beauty.Icon2") // e.g., for Female
+    val default = ComponentName(context, "com.first.beauty.IconDefault")
+    val male = ComponentName(context, "com.first.beauty.IconMale") // e.g., for Male
+    val female = ComponentName(context, "com.first.beauty.IconFemale") // e.g., for Female
 
     // Disable all first
     packageManager.setComponentEnabledSetting(default, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)

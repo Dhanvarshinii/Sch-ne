@@ -17,6 +17,8 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+
+
 }
 
 rootProject.name = "Schöne"

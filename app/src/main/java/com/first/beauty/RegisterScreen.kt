@@ -6,6 +6,7 @@ package com.first.beauty
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
+import android.view.WindowInsetsAnimation
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -41,6 +42,10 @@ import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import retrofit2.Response
+import retrofit2.Call
+import retrofit2.Callback
+
 
 @SuppressLint("UseKtx")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,9 +92,9 @@ fun RegisterScreen(navController: NavController) {
         TextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Email / Username") },
+            label = { Text("Username") },
             keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Text
             ),
             modifier = Modifier.fillMaxWidth()
         )
@@ -198,11 +203,43 @@ fun RegisterScreen(navController: NavController) {
 
                     setLauncherIcon(context, selectedGender)
 
-                    // Optionally save gender in SharedPreferences for reuse
+                    // save gender in SharedPreferences for reuse
                     context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
                         .edit().putString("gender", selectedGender).apply()
-                    // Navigate or do further logic
-                    navController.navigate("home")
+                    // Prepare request
+                    val registerRequest = RegisterRequest(
+                        name = name,
+                        username = username,
+                        email = email,
+                        password = password,
+                        country = country,
+                        dob = dob,
+                        gender = selectedGender
+                    )
+
+                    // Send request
+                    RetrofitClient.api.registerUser(registerRequest).enqueue(object : Callback<RegisterResponse> {
+                        override fun onResponse(call: Call<RegisterResponse>, response: Response<RegisterResponse>) {
+                            if (response.isSuccessful) {
+                                val result = response.body()
+                                if (result?.success == true) {
+                                    navController.navigate("home"){
+                                    popUpTo("register") { inclusive = true }
+                                }
+                                } else {
+                                    errorMessage = result?.message ?: "Unknown error occurred"
+                                }
+                            } else {
+                                errorMessage = "Server error: ${response.code()}"
+                            }
+                        }
+
+
+                        override fun onFailure(call: Call<RegisterResponse>, t: Throwable) {
+                            errorMessage = "Network error: ${t.localizedMessage}"
+                        }
+                    })
+
                 }
             },
             modifier = Modifier.fillMaxWidth()

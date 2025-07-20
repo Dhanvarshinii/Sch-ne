@@ -1,148 +1,108 @@
 package com.first.beauty
 
-import android.content.Context
+import LoginViewModel
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.Button
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
-//noinspection UsingMaterialAndMaterial3Libraries
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.Text
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.ui.platform.LocalContext
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.TextField
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.first.beauty.data.LoginDataSource
-import com.first.beauty.data.LoginRepository
-import com.first.beauty.ui.login.LoginViewModel
-import com.first.beauty.ui.login.LoginViewModelFactory
-
+import androidx.navigation.NavController
+import com.first.beauty.data.model.LoggedInUserView
+import com.first.beauty.ui.login.*
 
 
 @Composable
-fun LoginScreen(navController: NavController, onLoginSuccess: () -> Unit) {
-    var email by remember { mutableStateOf("") }
+fun LoginScreen(
+    navController: NavController,
+    onLoginSuccess: (LoggedInUserView) -> Unit,  // Accept LoggedInUserView here
+    onRegisterClick: () -> Unit
+) {
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-    // Get the context using LocalContext
     val context = LocalContext.current
-    val loginViewModel: LoginViewModel = viewModel(
-        factory = LoginViewModelFactory(context)
-    )
+    val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(context))
+    val loginResult by loginViewModel.loginResult.observeAsState()
 
-    // Get the gender from SharedPreferences to determine the logo
-    val sharedPref = context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
-    val gender = sharedPref.getString("gender", "neutral") // Default to "neutral"
-
-    // Select the logo based on gender
-    val logoRes = when (gender) {
-        "male" -> R.drawable.ic_logo_male  // male logo
-        "female" -> R.drawable.ic_logo_female  // female logo
-        else -> R.drawable.ic_logo_default  // Default or neutral logo
-    }
-
-    // Observe login result
-    LaunchedEffect(loginViewModel.loginResult) {
-        val loginResult = loginViewModel.loginResult.value
-        loginResult?.let {
-            if (it.error != null) {
-                errorMessage = context.getString(it.error)
-            } else if (it.success != null) {
-                onLoginSuccess()
-                navController.navigate("home")
+    LaunchedEffect(loginResult) {
+        loginResult?.let { result:LoginResult ->
+            if (result.success != null) {
+                onLoginSuccess(result.success)
+                navController.navigate("home") {
+                    popUpTo("login") { inclusive = true }
+                }
+            } else if (result.error != null) {
+                errorMessage = context.getString(result.error)
             }
         }
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Display the logo based on gender
+
+        // Add Icon at top
         Image(
-            painter = painterResource(id = logoRes),
-            contentDescription = "App Logo",
-            modifier = Modifier.height(120.dp) // Adjust size as necessary
+            painter = painterResource(id = R.drawable.ic_logo_default),  // replace with your icon resource name
+            contentDescription = "App Icon",
+            modifier = Modifier
+                .size(100.dp)
+                .padding(bottom = 32.dp)
+
         )
 
-        Text("Welcome Back!", style = MaterialTheme.typography.h4)
-
+        Text("Login", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
-        // Email Input
+
         TextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            ),
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Username") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // Password Input
         TextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
 
         if (errorMessage.isNotEmpty()) {
-            Text(text = errorMessage, color = Color.Red)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(errorMessage, color = MaterialTheme.colorScheme.error)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Log In Button
         Button(
             onClick = {
-                if (email.isNotEmpty() && password.isNotEmpty()) {
-                    loginViewModel.login(email, password)
+                if (username.isNotBlank() && password.isNotBlank()) {
+                    loginViewModel.login(username, password)
+                    errorMessage = ""
                 } else {
-                    errorMessage = "Please fill in all fields."
+                    errorMessage = "Please fill all fields"
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -150,23 +110,18 @@ fun LoginScreen(navController: NavController, onLoginSuccess: () -> Unit) {
             Text("Log In")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // Register Button
-        TextButton(onClick = { navController.navigate("register") }
-        ) {
-            Text("New User? Register Here")
-        }
+        // Register text below login button
+        Text(
+            text = "Register for new users",
+            color = MaterialTheme.colorScheme.primary,
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier
+                .clickable { onRegisterClick() }
+                .padding(8.dp)
+        )
+
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewLoginScreen() {
-    LoginScreen(
-        navController = rememberNavController(),
-        onLoginSuccess = {} // Provide an empty lambda as a default action
-    )
 }
 

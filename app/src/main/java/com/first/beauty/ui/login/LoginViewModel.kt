@@ -1,54 +1,64 @@
-package com.first.beauty.ui.login
-
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import android.util.Patterns
-import com.first.beauty.data.LoginRepository
-import com.first.beauty.data.Result
+import android.content.Context
+import androidx.lifecycle.*
+import com.first.beauty.ApiService
+import com.first.beauty.LoginRequest
 import com.first.beauty.R
+import com.first.beauty.data.model.LoggedInUser
+import com.first.beauty.data.model.LoggedInUserView
+import com.first.beauty.ui.login.LoginFormState
+import com.first.beauty.ui.login.LoginResult
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
-class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
-
-    private val _loginForm = MutableLiveData<LoginFormState>()
-    val loginFormState: LiveData<LoginFormState> = _loginForm
+class LoginViewModel(private val context: Context) : ViewModel() {
 
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> = _loginResult
 
-    fun login(username: String, password: String) {
-        // can be launched in a separate asynchronous job
-        val result = loginRepository.login(username, password)
+    private val _loginFormState = MutableLiveData<LoginFormState>()
+    val loginFormState: LiveData<LoginFormState> = _loginFormState
 
-        if (result is Result.Success) {
-            _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
-        } else {
-            _loginResult.value = LoginResult(error = R.string.login_failed)
+    private val retrofit = Retrofit.Builder()
+        .baseUrl("http://10.0.2.2:5001/") // Android emulator localhost
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    private val api = retrofit.create(ApiService::class.java)
+
+    fun login(username: String, password: String) {
+        viewModelScope.launch {
+            try {
+                val response = api.loginUser(LoginRequest(username, password))
+                if (response.success && response.user != null) {
+                    val loggedInUserView = LoggedInUserView.fromLoggedInUser(response.user)
+                    _loginResult.postValue(LoginResult(success = loggedInUserView))
+                } else {
+                    _loginResult.postValue(LoginResult(error = R.string.login_failed))
+                }
+            } catch (e: Exception) {
+                _loginResult.postValue(LoginResult(error = R.string.login_failed))
+            }
         }
     }
+
 
     fun loginDataChanged(username: String, password: String) {
         if (!isUserNameValid(username)) {
-            _loginForm.value = LoginFormState(usernameError = R.string.invalid_username)
+            _loginFormState.value = LoginFormState(usernameError = R.string.invalid_username)
         } else if (!isPasswordValid(password)) {
-            _loginForm.value = LoginFormState(passwordError = R.string.invalid_password)
+            _loginFormState.value = LoginFormState(passwordError = R.string.invalid_password)
         } else {
-            _loginForm.value = LoginFormState(isDataValid = true)
+            _loginFormState.value = LoginFormState(isDataValid = true)
         }
     }
 
-    // A placeholder username validation check
     private fun isUserNameValid(username: String): Boolean {
-        return if (username.contains('@')) {
-            Patterns.EMAIL_ADDRESS.matcher(username).matches()
-        } else {
-            username.isNotBlank()
-        }
+        return username.isNotBlank()
     }
 
-    // A placeholder password validation check
     private fun isPasswordValid(password: String): Boolean {
-        return password.length > 5
+        return password.length >= 4
     }
 }
+

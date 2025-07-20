@@ -1,5 +1,6 @@
 package com.first.beauty.ui.login
 
+import LoginViewModel
 import android.app.Activity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -14,6 +15,7 @@ import android.widget.EditText
 import android.widget.Toast
 import com.first.beauty.databinding.ActivityLoginBinding
 import com.first.beauty.R
+import com.first.beauty.data.model.LoggedInUserView
 
 class LoginActivity : AppCompatActivity() {
 
