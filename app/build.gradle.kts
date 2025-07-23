@@ -68,6 +68,13 @@ dependencies {
     // Lifecycle components
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.benchmark.macro)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Compose essentials (already assumed you have)
+    implementation(libs.runtime.livedata)
 
     // Testing libraries
     testImplementation(libs.junit)
@@ -92,9 +99,5 @@ dependencies {
 
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.runtime.livedata)
-
-
-
-
 
 }

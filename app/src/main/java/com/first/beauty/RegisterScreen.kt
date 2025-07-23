@@ -8,6 +8,7 @@ import android.content.Context
 import android.os.Build
 import android.view.WindowInsetsAnimation
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,6 +43,7 @@ import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import retrofit2.Response
 import retrofit2.Call
 import retrofit2.Callback
@@ -250,9 +252,12 @@ fun RegisterScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Login Button
-        TextButton(onClick = { /* Navigate to Login screen */ }) {
+        TextButton(onClick = {
+            navController.navigate("login")
+        }) {
             Text(text = "Already have an account? Login")
         }
+
     }
 }
 

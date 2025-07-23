@@ -41,15 +41,9 @@ import androidx.compose.ui.unit.sp
 // ConcernScreen [3]
 @SuppressLint("MutableCollectionMutableState")
 @Composable
-fun ConcernsScreen() {
-    var selectedConcerns by remember { mutableStateOf(mutableSetOf<String>()) }
-    var allergies by remember { mutableStateOf(TextFieldValue("")) }
-    val concernsList = listOf(
-        "Acne", "Dry Skin", "Oily Skin", "Hyperpigmentation",
-        "Redness/Sensitivity", "Dark Circles", "Fine Lines/Wrinkles",
-        "Sun Damage", "Enlarged Pores"
-    )
-
+fun ConcernsScreen(userConcerns: List<String>,
+                   userAllergies: String = ""
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,97 +51,44 @@ fun ConcernsScreen() {
             .verticalScroll(rememberScrollState())
     ) {
         // Title
-        Text("Tell us about your skin concerns & allergies", fontSize = 20.sp, color = Color.Black)
-
+        Text("Hi! Here’s help for your concerns 👇", fontSize = 20.sp, color = Color.Black)
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Multi-Selection for Skin Concerns
-        concernsList.forEach { concern ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(if (selectedConcerns.contains(concern)) Color(0xFF80CBC4) else Color.LightGray)
-                    .padding(12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(concern, fontSize = 16.sp)
-                IconButton(
-                    onClick = {
-                        selectedConcerns = selectedConcerns.toMutableSet().apply {
-                            if (contains(concern)) remove(concern) else add(concern)
-                        }
-                    }
-                ) {
-                    if (selectedConcerns.contains(concern)) {
-                        Icon(Icons.Default.Check, contentDescription = "Selected", tint = Color.Green)
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Allergy Input
-        val focusManager = LocalFocusManager.current
-        Text("Allergies (Optional)", fontSize = 18.sp, color = Color.Black)
-        BasicTextField(
-            value = allergies,
-            onValueChange = { allergies = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White, RoundedCornerShape(8.dp))
-                .padding(12.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Save & Update Button
-        Button(
-            onClick = { /* Save User Preferences */ },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF009688))
-        ) {
-            Text("Save & Update", color = Color.White, fontSize = 16.sp)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Dynamic Recommendations Based on Selection
-        if (selectedConcerns.isNotEmpty()) {
-            Text("Recommended Routine & Ingredients", fontSize = 20.sp, color = Color.Black)
-
-            selectedConcerns.forEach { concern ->
+        if (userConcerns.isNotEmpty()) {
+            userConcerns.forEach { concern ->
                 RecommendationSection(concern)
+                Spacer(modifier = Modifier.height(8.dp))
             }
+        } else {
+            Text("You haven’t selected any concerns yet.")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        if (userAllergies.isNotBlank()) {
+            Text("🚫 Your Allergies", fontSize = 18.sp, color = Color.Black)
+            Text(userAllergies, fontSize = 16.sp, color = Color.DarkGray)
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         // Product Suggestions
-        Text("Personalized Product Recommendations", fontSize = 20.sp, color = Color.Black)
-        Text("💡 Based on your concerns, we recommend dermatologist-approved products.", fontSize = 14.sp)
-        // (You can populate products dynamically from API)
+        Text("🎯 Personalized Product Recommendations", fontSize = 20.sp, color = Color.Black)
+        Text("💡 Based on your concerns, here are some helpful products.", fontSize = 14.sp)
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Dermatologist Advice & Articles
-        Text("Dermatologist Advice & Articles", fontSize = 20.sp, color = Color.Black)
+        Text("🧠 Advice & Articles", fontSize = 20.sp, color = Color.Black)
         Text("📖 How to reduce redness naturally", fontSize = 16.sp)
         Text("💡 The best anti-aging ingredients", fontSize = 16.sp)
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Community Q&A (Optional)
-        Text("Community & Q&A", fontSize = 20.sp, color = Color.Black)
+        // Community Q&A
+        Text("🌐 Community & Q&A", fontSize = 20.sp, color = Color.Black)
         Text("🤔 Have questions? Ask the community!", fontSize = 16.sp)
     }
 }
-
 @Composable
 fun RecommendationSection(concern: String) {
     val recommendations = mapOf(
@@ -180,5 +121,8 @@ fun RecommendationSection(concern: String) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewConcernScreen() {
-    ConcernsScreen()
+    ConcernsScreen(
+        userConcerns = listOf("Dry Skin", "Hyperpigmentation"),
+        userAllergies = "Peanuts, Parabens"
+    )
 }

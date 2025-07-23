@@ -12,6 +12,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -23,15 +24,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.first.beauty.ui.login.*
 import com.first.beauty.data.model.LoggedInUserView
-
-
-
 
 
 //Don't change this
@@ -61,7 +60,18 @@ fun MyApp() {
         bottomBar = {
             // Only show bottom bar for these routes
             if (currentRoute in listOf("home", "routine", "concerns", "challenges")) {
-                BottomNavBar(selectedTab) { selectedTab = it }
+                BottomNavBar(
+                    selectedTab = selectedTab,
+                    onTabSelected = { index ->
+                        selectedTab = index
+                        when (index) {
+                            0 -> navController.navigate("home")
+                            1 -> navController.navigate("routine")
+                            2 -> navController.navigate("concerns")
+                            3 -> navController.navigate("challenges")
+                        }
+                    }
+                )
             }
         }
     ) { paddingValues ->
@@ -70,7 +80,10 @@ fun MyApp() {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            NavHost(navController = navController, startDestination = "login") {
+            NavHost(navController = navController, startDestination = "getting_started") {
+                composable("getting_started") {
+                    GettingStartedPage(navController = navController)
+                }
                 composable("login") {
                     LoginScreen(
                         navController = navController,
@@ -92,9 +105,10 @@ fun MyApp() {
                     )
                 }
                 composable("register") { RegisterScreen(navController) }
-                composable("home") { HomeScreen() }
+                composable("home") { HomeScreen(userName = "Test1") }
                 composable("routine") { RoutineScreen() }
-                composable("concerns") { ConcernsScreen() }
+                composable("concerns") { ConcernsScreen(userConcerns = listOf("Dry Skin", "Hyperpigmentation"),
+                    userAllergies = "Peanuts, Parabens") }
                 composable("challenges") { ChallengesScreen() }
             }
         }
@@ -109,25 +123,33 @@ fun BottomNavBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
         contentColor = Color.Black
     ) {
         NavigationBarItem(
-            icon = { Icon(painter = painterResource(id = R.drawable.ic_launcher_foreground), contentDescription = "Home") },
+            icon = { Icon(painter = painterResource(id = R.drawable.icons8_home_2),
+                contentDescription = "Home",
+                modifier = Modifier.size(36.dp)) },
             label = { Text("Home") },
             selected = selectedTab == 0,
             onClick = { onTabSelected(0) }
         )
         NavigationBarItem(
-            icon = { Icon(painter = painterResource(id = R.drawable.ic_launcher_foreground), contentDescription = "Routine") },
+            icon = { Icon(painter = painterResource(id = R.drawable.icons8_add_square),
+                contentDescription = "Routine",
+                modifier = Modifier.size(28.dp)) },
             label = { Text("Routine") },
             selected = selectedTab == 1,
             onClick = { onTabSelected(1) }
         )
         NavigationBarItem(
-            icon = { Icon(painter = painterResource(id = R.drawable.ic_launcher_foreground), contentDescription = "Concerns") },
+            icon = { Icon(painter = painterResource(id = R.drawable.icons8_search_1),
+                contentDescription = "Concerns",
+                modifier = Modifier.size(28.dp)) },
             label = { Text("Concerns") },
             selected = selectedTab == 2,
             onClick = { onTabSelected(2) }
         )
         NavigationBarItem(
-            icon = { Icon(painter = painterResource(id = R.drawable.ic_launcher_foreground), contentDescription = "Challenges") },
+            icon = { Icon(painter = painterResource(id = R.drawable.icons8_challenge),
+                contentDescription = "Challenges",
+                modifier = Modifier.size(28.dp)) },
             label = { Text("Challenges") },
             selected = selectedTab == 3,
             onClick = { onTabSelected(3) }
@@ -135,6 +157,7 @@ fun BottomNavBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
     }
 }
 
+// Dynamically the app icon changes
 fun setLauncherIcon(context: Context, gender: String) {
     val packageManager = context.packageManager
     val default = ComponentName(context, "com.first.beauty.IconDefault")
@@ -155,16 +178,7 @@ fun setLauncherIcon(context: Context, gender: String) {
 
     packageManager.setComponentEnabledSetting(selected, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
 
-    // Relaunch the launcher icon
-    val intent = Intent(Intent.ACTION_MAIN).apply {
-        addCategory(Intent.CATEGORY_HOME)
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    }
-    context.startActivity(intent)
 }
-
-
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
