@@ -1,9 +1,9 @@
 # Schöne - Android application
 
-# # Programming language
+#  Programming language
 
 Python 3, Kotlin, Java
 
-# # Platform
+#  Platform
 
 Android studio
