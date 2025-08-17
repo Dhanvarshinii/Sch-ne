@@ -1,4 +1,4 @@
-package com.first.beauty
+package com.first.beauty.ui.login
 
 import LoginViewModel
 import androidx.compose.foundation.BorderStroke
@@ -15,10 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Divider
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.TextFieldDefaults // ✅ correct
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -34,8 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -46,14 +44,15 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.first.beauty.R
 import com.first.beauty.data.model.LoggedInUserView
-import com.first.beauty.ui.login.LoginResult
-import com.first.beauty.ui.login.LoginViewModelFactory
 import com.first.beauty.ui.theme.CharcoalGray
 import com.first.beauty.ui.theme.CoolGray
 import com.first.beauty.ui.theme.PorcelainWhite
 import com.first.beauty.ui.theme.SoftIvory
 import com.first.beauty.ui.theme.WarmTaupe
+import androidx.compose.ui.text.TextStyle
+
 
 
 @Composable
@@ -245,22 +244,40 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                buildAnnotatedString {
-                    append("New to Schöne? ")
-                    withStyle(
-                        style = SpanStyle(
-                            color = CharcoalGray,
-                            fontWeight = FontWeight.Medium
-                        )
-                    ) {
-                        append("Create an account")
-                    }
-                },
-                color = CoolGray,
-                modifier = Modifier.clickable {
-                    navController.navigate("register")
+            val annotatedText = buildAnnotatedString {
+                append("New to Schöne? ")
+
+                // Only this part is clickable
+                pushStringAnnotation(
+                    tag = "REGISTER",
+                    annotation = "register"
+                )
+                withStyle(
+                    style = SpanStyle(
+                        color = CharcoalGray,
+                        fontWeight = FontWeight.Medium
+                    )
+                ) {
+                    append("Create an account")
                 }
+                pop()
+            }
+
+            ClickableText(
+                text = annotatedText,
+                style = TextStyle(color = CoolGray),
+                onClick = { offset ->
+                    annotatedText
+                        .getStringAnnotations(
+                            tag = "REGISTER",
+                            start = offset,
+                            end = offset
+                        )
+                        .firstOrNull()?.let {
+                            navController.navigate("register")
+                        }
+                }
+
             )
         }
     }

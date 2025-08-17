@@ -1,9 +1,8 @@
 import android.content.Context
 import androidx.lifecycle.*
-import com.first.beauty.ApiService
-import com.first.beauty.LoginRequest
+import com.first.beauty.data.remote.ApiService
+import com.first.beauty.data.remote.LoginRequest
 import com.first.beauty.R
-import com.first.beauty.data.model.LoggedInUser
 import com.first.beauty.data.model.LoggedInUserView
 import com.first.beauty.ui.login.LoginFormState
 import com.first.beauty.ui.login.LoginResult

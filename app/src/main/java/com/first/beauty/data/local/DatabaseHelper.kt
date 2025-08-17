@@ -1,4 +1,4 @@
-package com.first.beauty
+package com.first.beauty.data.local
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase

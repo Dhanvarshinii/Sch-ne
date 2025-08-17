@@ -1,4 +1,4 @@
-package com.first.beauty
+package com.first.beauty.data.remote
 
 import com.first.beauty.data.model.LoggedInUser
 import retrofit2.Call

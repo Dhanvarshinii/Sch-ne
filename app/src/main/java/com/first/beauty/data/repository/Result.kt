@@ -1,4 +1,4 @@
-package com.first.beauty.data
+package com.first.beauty.data.repository
 
 sealed class Result<out T> {
     data class Success<out T>(val data: T) : Result<T>()

@@ -1,4 +1,4 @@
-package com.first.beauty
+package com.first.beauty.ui.register
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
 //noinspection UsingMaterialAndMaterial3Libraries
@@ -6,9 +6,7 @@ package com.first.beauty
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
-import android.view.WindowInsetsAnimation
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,7 +41,10 @@ import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextDecoration
+import com.first.beauty.data.remote.RegisterRequest
+import com.first.beauty.data.remote.RegisterResponse
+import com.first.beauty.data.remote.RetrofitClient
+import com.first.beauty.setLauncherIcon
 import retrofit2.Response
 import retrofit2.Call
 import retrofit2.Callback

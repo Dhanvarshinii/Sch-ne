@@ -1,4 +1,4 @@
-package com.first.beauty
+package com.first.beauty.ui.home
 
 import android.os.Build
 import androidx.annotation.RequiresApi

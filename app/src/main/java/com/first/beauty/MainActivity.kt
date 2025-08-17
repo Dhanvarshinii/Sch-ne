@@ -2,7 +2,6 @@ package com.first.beauty
 
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -29,8 +28,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.first.beauty.ui.login.*
 import com.first.beauty.data.model.LoggedInUserView
+import com.first.beauty.ui.home.ChallengesScreen
+import com.first.beauty.ui.home.ConcernsScreen
+import com.first.beauty.ui.home.HomeScreen
+import com.first.beauty.ui.home.RoutineScreen
+import com.first.beauty.ui.login.LoginScreen
+import com.first.beauty.ui.onboarding.GettingStartedPage
+import com.first.beauty.ui.register.RegisterScreen
 
 
 //Don't change this
@@ -99,7 +104,7 @@ fun MyApp() {
                             }
                         },
 
-                                onRegisterClick = {
+                        onRegisterClick = {
                             navController.navigate("register")
                         }
                     )
@@ -107,8 +112,12 @@ fun MyApp() {
                 composable("register") { RegisterScreen(navController) }
                 composable("home") { HomeScreen(userName = "Test1") }
                 composable("routine") { RoutineScreen() }
-                composable("concerns") { ConcernsScreen(userConcerns = listOf("Dry Skin", "Hyperpigmentation"),
-                    userAllergies = "Peanuts, Parabens") }
+                composable("concerns") {
+                    ConcernsScreen(
+                        userConcerns = listOf("Dry Skin", "Hyperpigmentation"),
+                        userAllergies = "Peanuts, Parabens"
+                    )
+                }
                 composable("challenges") { ChallengesScreen() }
             }
         }
