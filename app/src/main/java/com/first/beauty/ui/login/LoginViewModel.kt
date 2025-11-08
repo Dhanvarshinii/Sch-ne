@@ -4,6 +4,8 @@ import com.first.beauty.data.remote.ApiService
 import com.first.beauty.data.remote.LoginRequest
 import com.first.beauty.R
 import com.first.beauty.data.model.LoggedInUserView
+import com.first.beauty.data.repository.LoginDataSource
+import com.first.beauty.data.repository.LoginRepository
 import com.first.beauty.ui.login.LoginFormState
 import com.first.beauty.ui.login.LoginResult
 import kotlinx.coroutines.launch
@@ -24,6 +26,14 @@ class LoginViewModel(private val context: Context) : ViewModel() {
         .build()
 
     private val api = retrofit.create(ApiService::class.java)
+
+    // ✅ Add repository reference
+    private val repository = LoginRepository(LoginDataSource(context))
+
+    // ✅ Helper function for Google Sign-In email check
+    suspend fun isEmailRegistered(email: String): Boolean {
+        return repository.isEmailRegistered(email)
+    }
 
     fun login(username: String, password: String) {
         viewModelScope.launch {
