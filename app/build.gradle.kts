@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.first.beauty"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.first.beauty"
@@ -99,5 +99,8 @@ dependencies {
 
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.runtime.livedata)
+
+    // Google logins
+    implementation(libs.google.play.services.auth)
 
 }

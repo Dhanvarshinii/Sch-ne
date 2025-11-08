@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "219736585947",
+    "project_id": "beauty-app-6286f",
+    "storage_bucket": "beauty-app-6286f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:219736585947:android:1e0d26eff37f404fcbfefe",
+        "android_client_info": {
+          "package_name": "com.first.beauty"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCglooIshXOUcaWem5GQyH9d9BfqjFiIZc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
