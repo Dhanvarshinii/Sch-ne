@@ -92,6 +92,7 @@ dependencies {
 
     // UI testing
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    implementation(libs.material.icons.extended)
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson) // If using alias
