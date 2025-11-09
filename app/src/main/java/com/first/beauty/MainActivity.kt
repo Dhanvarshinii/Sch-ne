@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -37,13 +36,9 @@ import com.first.beauty.ui.home.RoutineScreen
 import com.first.beauty.ui.login.LoginScreen
 import com.first.beauty.ui.onboarding.GettingStartedPage
 import com.first.beauty.ui.register.RegisterScreen
-import androidx.activity.result.contract.ActivityResultContracts
-import com.first.beauty.data.auth.GoogleAuthManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import perfetto.protos.AndroidAnomalyMetric
 
 
 //Don't change this
