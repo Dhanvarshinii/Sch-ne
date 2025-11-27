@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection URI
-const uri = "mongodb+srv://dhanvarshinii:wVvkIQbPKrFaFGKe@beauty-backend.qmgohpa.mongodb.net/?retryWrites=true&w=majority&appName=beauty-backend";
+const uri = process.env.MONGO_URI;
 
 const client = new MongoClient(uri, {
   serverApi: {
