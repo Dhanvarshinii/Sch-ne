@@ -36,10 +36,14 @@ import com.first.beauty.ui.home.RoutineScreen
 import com.first.beauty.ui.login.LoginScreen
 import com.first.beauty.ui.onboarding.GettingStartedPage
 import com.first.beauty.ui.register.RegisterScreen
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 
 //Don't change this
 class MainActivity : ComponentActivity() {
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +52,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -58,7 +63,6 @@ fun MyApp() {
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
-
     var selectedTab by remember { mutableIntStateOf(0) }
 
     Scaffold(

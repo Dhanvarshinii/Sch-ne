@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.first.beauty"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.first.beauty"
@@ -92,6 +92,7 @@ dependencies {
 
     // UI testing
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    implementation(libs.material.icons.extended)
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson) // If using alias
@@ -99,5 +100,8 @@ dependencies {
 
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.runtime.livedata)
+
+    // Google logins
+    implementation(libs.google.play.services.auth)
 
 }
