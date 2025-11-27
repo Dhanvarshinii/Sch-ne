@@ -1,15 +1,22 @@
+# Android / Java
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
+/.idea
 /build
 /captures
 .externalNativeBuild
-.cxx
-local.properties
+
+# Node.js backend
+beauty-backend/node_modules/
+beauty-backend/.env
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Optional: screenshots / temp files
+*.tmp
+
