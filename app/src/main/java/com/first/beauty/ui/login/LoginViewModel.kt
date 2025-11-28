@@ -21,7 +21,7 @@ class LoginViewModel(private val context: Context) : ViewModel() {
     val loginFormState: LiveData<LoginFormState> = _loginFormState
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:5001/") // Android emulator localhost
+        .baseUrl("https://sch-ne.onrender.com/") // Android emulator localhost
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
