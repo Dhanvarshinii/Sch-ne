@@ -28,6 +28,17 @@ data class LoginResponse(
 )
 
 
+data class CheckEmailRequest(val email: String)
+data class CheckEmailResponse(val exists: Boolean)
+data class GoogleLoginRequest(
+    val idToken: String
+)
+
+data class UserResponse(
+    val success: Boolean,
+    val user: LoggedInUser? // null if not found
+)
+
 
 interface ApiService {
     @POST("/api/register")
@@ -35,4 +46,14 @@ interface ApiService {
 
     @POST("login")
     suspend fun loginUser(@Body request: LoginRequest): LoginResponse
+
+    @POST("/api/check-email")
+    suspend fun checkEmail(@Body request: CheckEmailRequest): CheckEmailResponse
+
+    @POST("/api/google-login")
+    suspend fun googleLogin(@Body request: GoogleLoginRequest): UserResponse
+
+    @POST("/api/get-user-by-email")
+    suspend fun getUserByEmail(@Body request: CheckEmailRequest): UserResponse
+
 }

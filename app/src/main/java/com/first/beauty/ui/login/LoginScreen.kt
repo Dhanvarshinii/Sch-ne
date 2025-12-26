@@ -1,7 +1,6 @@
 package com.first.beauty.ui.login
 
-import LoginViewModel
-import com.first.beauty.data.repository.LoginRepository
+import com.first.beauty.ui.login.LoginViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,12 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -42,7 +41,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -55,75 +53,96 @@ import com.first.beauty.ui.theme.SoftIvory
 import com.first.beauty.ui.theme.WarmTaupe
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.rememberCoroutineScope
 import com.first.beauty.data.auth.GoogleAuthManager
 import kotlinx.coroutines.launch
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import androidx.compose.material3.HorizontalDivider
 
 
 @Composable
 fun LoginScreen(
     navController: NavController,
     onLoginSuccess: (LoggedInUserView) -> Unit,  // Accept LoggedInUserView here
-    onRegisterClick: () -> Unit,
+    onRegisterClick: () -> Unit  // ✅ Add this
 ) {
+    val context = LocalContext.current
+
+    val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(context))
+
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+    var showRegisterDialog by remember { mutableStateOf(false) }
+    var googleEmail by remember { mutableStateOf("") }
 
-    val context = LocalContext.current
-    val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(context))
     val loginResult by loginViewModel.loginResult.observeAsState()
-
-    // Google Sign-In setup
-    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestEmail()
-        .build()
-
-    val googleSignInClient = GoogleSignIn.getClient(context, gso)
     val scope = rememberCoroutineScope()
 
-    val launcher = rememberLauncherForActivityResult(
+    val googleClient = remember {
+        GoogleAuthManager.getClient(context)
+    }
+
+    // 🔥 IMPORTANT: Always show account picker
+    LaunchedEffect(key1 = true) {
+        googleClient.signOut()
+    }
+
+    // 🔥 Launcher to handle Google Sign-In result
+    val googleLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        GoogleAuthManager.handleSignInResult(
-            result,
-            onSuccess = { account ->
-                val email = account.email ?: ""
 
-                // Coroutine to check registration
+        if (result.resultCode != android.app.Activity.RESULT_OK || result.data == null) {
+            errorMessage = "Google sign-in cancelled"
+            return@rememberLauncherForActivityResult
+        }
+
+        // Call handleSignInResult from your GoogleAuthManager
+        GoogleAuthManager.handleSignInResult(
+            data = result.data, // pass as positional or named 'data'
+            onSuccess = { email ->
                 scope.launch {
-                    val registered = loginViewModel.isEmailRegistered(email)
-                    if (registered) {
-                        navController.navigate("home") { popUpTo("login") { inclusive = true } }
+                    val user = loginViewModel.loginWithGoogle(email)
+
+                    if (user != null) {
+                        // ✅ Registered user → go home
+                        onLoginSuccess(user)
+                        navController.navigate("home") {
+                            popUpTo("login") { inclusive = true }
+                        }
                     } else {
-                        navController.navigate("register")
+                        // 🔹 Not registered → show dialog
+                        googleEmail = email
+                        showRegisterDialog = true
                     }
                 }
             },
-            onError = { e ->
-                Log.e("GoogleLogin", "Error: ${e.message}")
-                errorMessage = "Google sign-in failed. Try again."
+            onError = {
+                errorMessage = "Google sign-in failed"
             }
         )
     }
 
-    // Observe normal login result
+
+    // Observe normal login via API
     LaunchedEffect(loginResult) {
-        loginResult?.let { result: LoginResult ->
-            if (result.success != null) {
-                onLoginSuccess(result.success)
+        loginResult?.let { result ->
+            result.success?.let {
+                onLoginSuccess(it)
                 navController.navigate("home") {
                     popUpTo("login") { inclusive = true }
                 }
-            } else if (result.error != null) {
-                errorMessage = context.getString(result.error)
+            }
+
+            result.error?.let {
+                errorMessage = context.getString(it)
             }
         }
     }
 
+    // ------------------ UI START ---------------------
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -231,7 +250,7 @@ fun LoginScreen(
         Button(
             onClick = {
                 if (username.isNotBlank() && password.isNotBlank()) {
-                    loginViewModel.login(username, password)
+                    loginViewModel.login(username.trim(), password)
                     errorMessage = ""
                 } else {
                     errorMessage = "Please fill all fields"
@@ -256,37 +275,65 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Divider(modifier = Modifier.weight(1f))
+            HorizontalDivider(modifier = Modifier.weight(1f).height(1.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
             Text(
                 text = "or",
                 color = CoolGray,
                 style = MaterialTheme.typography.labelMedium
             )
 
-            Divider(modifier = Modifier.weight(1f))
+            HorizontalDivider(modifier = Modifier.weight(1f).height(1.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Sign in with Google button
+        // Google sign-in button
         Button(
             onClick = {
-                launcher.launch(GoogleAuthManager.getSignInIntent(googleSignInClient))
+                googleLauncher.launch(googleClient.signInIntent)
             },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_google_logo),
-                contentDescription = "Google Sign-In",
+                contentDescription = "Google",
                 tint = Color.Unspecified,
                 modifier = Modifier.size(20.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Text("Sign in with Google", color = Color.Black)
         }
 
-        Spacer(modifier = Modifier.height(28.dp))
+
+        if (showRegisterDialog) {
+            AlertDialog(
+                onDismissRequest = { showRegisterDialog = false },
+                title = { Text("User not registered") },
+                text = {
+                    Text("This Google account is not registered. Please create an account.")
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showRegisterDialog = false
+                            navController.navigate("register?email=$googleEmail")
+                        }
+                    ) {
+                        Text("Register")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showRegisterDialog = false }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+
 
         // Bottom Text - Register
         Box(
@@ -295,40 +342,26 @@ fun LoginScreen(
         ) {
             val annotatedText = buildAnnotatedString {
                 append("New to Schöne? ")
-
-                // Only this part is clickable
-                pushStringAnnotation(
-                    tag = "REGISTER",
-                    annotation = "register"
-                )
-                withStyle(
-                    style = SpanStyle(
-                        color = CharcoalGray,
-                        fontWeight = FontWeight.Medium
-                    )
-                ) {
+                pushStringAnnotation(tag = "REGISTER", annotation = "register")
+                withStyle(style = SpanStyle(color = CharcoalGray, fontWeight = FontWeight.Medium, textDecoration = TextDecoration.Underline)) {
                     append("Create an account")
                 }
                 pop()
             }
 
-            ClickableText(
+            Text(
                 text = annotatedText,
                 style = TextStyle(color = CoolGray),
-                onClick = { offset ->
-                    annotatedText
-                        .getStringAnnotations(
-                            tag = "REGISTER",
-                            start = offset,
-                            end = offset
-                        )
+                modifier = Modifier.clickable {
+                    annotatedText.getStringAnnotations("REGISTER", 0, annotatedText.length)
                         .firstOrNull()?.let {
                             navController.navigate("register")
                         }
                 }
-
             )
         }
     }
 }
+
+
 

@@ -53,7 +53,6 @@ async function startServer() {
         }
 
         const hashedPassword = await bcrypt.hash(password.trim(), 10);
-        console.log("🔐 Hashed password being stored:", hashedPassword);
 
         const newUser = {
           name,
@@ -77,18 +76,17 @@ async function startServer() {
     // LOGIN endpoint
     app.post('/login', async (req, res) => {
       try {
-        console.log("📥 Login request body:", req.body);
         const { username, password } = req.body;
     
         if (!username || !password) {
           return res.status(400).json({ success: false, message: 'Username and password required.' });
         }
     
-        const user = await usersCollection.findOne({ username });
-        if (!user) {
-          console.log("❌ User not found");
-          return res.status(401).json({ success: false, message: "Invalid username or password." });
-        }
+        const user = await usersCollection.findOne({
+                  $or: [{ username }, { email: username }] // <-- allow login by email or username
+                });
+
+        if (!user) return res.status(401).json({ success: false, message: "Invalid username or password." });
     
         console.log("🔒 Comparing password:", `"${password}"`);
         const isPasswordValid = await bcrypt.compare(password.trim(), user.password);
@@ -115,7 +113,49 @@ async function startServer() {
         res.status(500).json({ success: false, message: 'Login failed due to server error.' });
       }
     });
-    
+
+    // CHECK EMAIL endpoint (for Google Sign-In)
+    app.post('/api/check-email', async (req, res) => {
+          try {
+            const { email } = req.body;
+            if (!email) return res.status(400).json({ success: false, message: "Email is required." });
+
+            const user = await usersCollection.findOne({ email });
+            res.json({ exists: !!user });
+
+          } catch (error) {
+            console.error("💥 Check email error:", error);
+            res.status(500).json({ success: false, message: "Failed to check email." });
+          }
+        });
+
+    // GET USER BY EMAIL
+    app.post('/api/get-user-by-email', async (req, res) => {
+      try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ success: false, message: "Email is required." });
+
+        const user = await usersCollection.findOne({ email });
+
+        if (!user) return res.json({ success: false, user: null });
+
+        const userResponse = {
+          displayName: user.name,
+          gender: user.gender,
+          username: user.username,
+          email: user.email,
+          country: user.country,
+          dob: user.dob
+        };
+
+        res.json({ success: true, user: userResponse });
+      } catch (err) {
+        console.error("💥 Get user by email error:", err);
+        res.status(500).json({ success: false, user: null });
+      }
+    });
+
+
 
     // Start server
     app.listen(port, () => {

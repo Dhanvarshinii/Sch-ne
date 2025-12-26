@@ -1,6 +1,6 @@
 package com.first.beauty.ui.login
 
-import LoginViewModel
+import com.first.beauty.ui.login.LoginViewModel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

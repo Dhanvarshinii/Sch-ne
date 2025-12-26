@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.first.beauty"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -70,13 +70,12 @@ dependencies {
     // Lifecycle components
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.benchmark.macro)
-    implementation(libs.androidx.lifecycle.livedata.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     // Compose essentials (already assumed you have)
     implementation(libs.runtime.livedata)
+    implementation(libs.play.services.fido)
+    implementation(libs.support.annotations)
 
     // Testing libraries
     testImplementation(libs.junit)
@@ -102,8 +101,18 @@ dependencies {
 
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)   // For ViewModel and viewModelScope
+    implementation(libs.androidx.lifecycle.viewmodel.ktx) // For viewModelScope + Kotlin coroutines support
+
+
 
     // Google logins
     implementation(libs.google.play.services.auth)
+    implementation("com.google.firebase:firebase-auth:24.0.1")
+
 
 }
+
+
+
+

@@ -1,21 +1,20 @@
 package com.first.beauty.ui.login
 
-import LoginViewModel
 import android.app.Activity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
-import com.first.beauty.databinding.ActivityLoginBinding
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.first.beauty.R
 import com.first.beauty.data.model.LoggedInUserView
+import com.first.beauty.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
 

@@ -1,47 +1,43 @@
 package com.first.beauty.data.auth
 
+import android.app.Instrumentation.ActivityResult
 import android.content.Context
-import android.content.Intent
-import androidx.activity.result.ActivityResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 
 object GoogleAuthManager {
 
-    // Create Google Sign-In Client
-    fun getSignInClient(context: Context): GoogleSignInClient {
+    private const val WEB_CLIENT_ID =
+        "219736585947-e6ai7bs91lsootu5j58aqq9ec77qc3ol.apps.googleusercontent.com" // <-- Replace with yours
+
+    fun getClient(context: Context): GoogleSignInClient {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(WEB_CLIENT_ID)
             .requestEmail()
             .build()
 
         return GoogleSignIn.getClient(context, gso)
     }
 
-    // Launch Google Sign-In Intent
-    fun getSignInIntent(client: GoogleSignInClient): Intent {
-        return client.signInIntent
-    }
-
-    // Handle Sign-In result
     fun handleSignInResult(
-        result: ActivityResult,
-        onSuccess: (GoogleSignInAccount) -> Unit,
-        onError: (Exception) -> Unit
+        data: android.content.Intent?,
+        onSuccess: (email: String) -> Unit,
+        onError: () -> Unit
     ) {
         try {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            val account = task.getResult(ApiException::class.java)
-            if (account != null) {
-                onSuccess(account) // pass back the account object
-            } else {
-                onError(Exception("Google account is null"))
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            val account = task.getResult(Exception::class.java)
+            val email = account?.email
+
+            if (email.isNullOrEmpty()) {
+                onError()
+                return
             }
-        } catch (e: ApiException) {
-            onError(e)
+
+            onSuccess(email)
+        } catch (e: Exception) {
+            onError()
         }
     }
-
 }
