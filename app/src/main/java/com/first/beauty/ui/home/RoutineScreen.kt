@@ -4,197 +4,433 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.rememberPagerState
+import androidx.compose.ui.unit.sp
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import androidx.compose.material3.Card
-import androidx.compose.foundation.shape.RoundedCornerShape
-import java.time.DayOfWeek
-
-
-// Routine screen [2]
 
 @Composable
 fun RoutineScreen() {
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        RoutineContent()
+        LuxuryRoutineScreen()
     } else {
-        Text("This feature requires Android 8.0 (API 26) or higher.")
-    }
-}
-
-
-@RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun RoutineContent() {
-    // Get the current date using LocalDate (compatible with API level 24+)
-    val currentDate = LocalDate.now() // Get today's date using LocalDate
-    val pagerState = rememberPagerState()
-
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        HorizontalPagerIndicator(
-            pagerState = pagerState,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            activeColor = MaterialTheme.colorScheme.primary,
-            inactiveColor = Color.Gray,
-            spacing = 6.dp
-        )
-        HorizontalPager(
-            count = 3,
-            state = pagerState,
-            modifier = Modifier.fillMaxHeight(0.9f)
-        ) { page ->
-            val pageDate = when (page) {
-                0 -> currentDate.minusDays(1)
-                1 -> currentDate
-                else -> currentDate.plusDays(1)
-            }
-
-            val formattedDate = pageDate.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy"))
-            RoutinePage(pageDate, formattedDate)
-        }
+        Text("Requires Android 8+")
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun RoutinePage(date: LocalDate, formattedDate: String) {
-    var fabExpanded by remember { mutableStateOf(false) }
-    val isNoSkincareDay = date.dayOfWeek == DayOfWeek.SUNDAY // You can later make this editable
+fun LuxuryRoutineScreen() {
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(12.dp)
+    val currentDate = LocalDate.now()
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color(0xFFF8F8F8)
     ) {
-        Text(
-            text = "Routine for $formattedDate",
-            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
 
-        if (isNoSkincareDay) {
-            Card(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0))
+        Box {
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 120.dp)
             ) {
-                Text(
-                    text = "It's your no-skincare day! Let your skin breathe.",
-                    modifier = Modifier.padding(16.dp),
-                    color = Color(0xFF8D6E63)
-                )
+
+                // HEADER
+                item {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                            .padding(horizontal = 22.dp, vertical = 24.dp)
+                    ) {
+
+                        Text(
+                            text = currentDate.format(
+                                DateTimeFormatter.ofPattern("MMMM dd, yyyy")
+                            ).uppercase(),
+                            color = Color.Gray,
+                            fontSize = 11.sp,
+                            letterSpacing = 2.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = "Your Routines",
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Serif,
+                            color = Color.Black
+                        )
+                    }
+                }
+
+                // NO SKINCARE DAY
+                if (currentDate.dayOfWeek == DayOfWeek.SUNDAY) {
+
+                    item {
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.Black
+                            ),
+                            shape = RoundedCornerShape(18.dp)
+                        ) {
+
+                            Column(
+                                modifier = Modifier.padding(18.dp)
+                            ) {
+
+                                Text(
+                                    text = "REST DAY",
+                                    color = Color.Gray,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 2.sp
+                                )
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Text(
+                                    text = "It's your no-skincare day. Let your skin breathe naturally today.",
+                                    color = Color.White,
+                                    lineHeight = 22.sp,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // ROUTINES
+                item {
+                    RoutineExpandableCard(
+                        emoji = "🌅",
+                        title = "Morning Routine",
+                        steps = listOf(
+                            "Cleanser",
+                            "Vitamin C Serum",
+                            "Moisturizer",
+                            "SPF 50"
+                        )
+                    )
+                }
+
+                item {
+                    RoutineExpandableCard(
+                        emoji = "☀️",
+                        title = "Afternoon Routine",
+                        steps = emptyList()
+                    )
+                }
+
+                item {
+                    RoutineExpandableCard(
+                        emoji = "🌙",
+                        title = "Night Routine",
+                        steps = listOf(
+                            "Oil Cleanser",
+                            "Retinol",
+                            "Night Cream"
+                        )
+                    )
+                }
+
+                item {
+                    RoutineExpandableCard(
+                        emoji = "✦",
+                        title = "Special Care",
+                        steps = emptyList()
+                    )
+                }
             }
-        }
 
-        RoutineSection("Morning Routine")
-        RoutineSection("Afternoon Routine")
-        RoutineSection("Night Routine")
-        RoutineSection("Special Care Routine")
-
-        Spacer(modifier = Modifier.height(40.dp))
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        FloatingActionButton(
-            onClick = { fabExpanded = !fabExpanded },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-        ) {
-            Icon(Icons.Default.Add, contentDescription = "Expand")
-        }
-
-        AnimatedVisibility(
-            visible = fabExpanded,
-            enter = slideInVertically(initialOffsetY = { 40 }) + expandVertically(),
-            exit = slideOutVertically(targetOffsetY = { 40 }),
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 90.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .background(Color.White, RoundedCornerShape(8.dp))
-                    .padding(8.dp)
-                    .width(200.dp)
-            ) {
-                DropdownItem(text = "Add Entry")
-                DropdownItem(text = "Edit Routine")
-                DropdownItem(text = "Reset Day")
-            }
+            // FLOATING ACTION BUTTON
+            FloatingRoutineMenu()
         }
     }
 }
 
 @Composable
-fun RoutineSection(title: String) {
+fun RoutineExpandableCard(
+    emoji: String,
+    title: String,
+    steps: List<String>
+) {
+
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .clickable {
+                expanded = !expanded
+            },
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        shape = RoundedCornerShape(18.dp),
+        border = CardDefaults.outlinedCardBorder()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "No routine added yet.", color = Color.Gray)
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { /* Add logic */ }) {
-                Text("Add $title")
+
+        Column {
+
+            // HEADER
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(18.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFF5F5F5)),
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                        Text(
+                            text = emoji,
+                            fontSize = 20.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(14.dp))
+
+                    Column {
+
+                        Text(
+                            text = title,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = Color.Black
+                        )
+
+                        Spacer(modifier = Modifier.height(3.dp))
+
+                        Text(
+                            text =
+                                if (steps.isEmpty())
+                                    "No steps yet"
+                                else
+                                    "${steps.size} steps",
+                            color = Color.Gray,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+
+                Icon(
+                    imageVector = Icons.Rounded.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = Color.Gray
+                )
+            }
+
+            // EXPANDED CONTENT
+            AnimatedVisibility(
+                visible = expanded,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut()
+            ) {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 18.dp)
+                        .padding(bottom = 18.dp)
+                ) {
+
+                    HorizontalDivider(
+                        color = Color(0xFFF2F2F2)
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    if (steps.isNotEmpty()) {
+
+                        steps.forEachIndexed { index, step ->
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+
+                                Text(
+                                    text = String.format("%02d", index + 1),
+                                    color = Color.LightGray,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 11.sp
+                                )
+
+                                Spacer(modifier = Modifier.width(16.dp))
+
+                                Text(
+                                    text = step,
+                                    color = Color.Black,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+
+                    } else {
+
+                        Text(
+                            text = "No steps added yet",
+                            color = Color.LightGray,
+                            fontSize = 13.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .border(
+                                1.dp,
+                                Color(0xFFE4E4E4),
+                                RoundedCornerShape(12.dp)
+                            )
+                            .clickable { }
+                            .padding(vertical = 14.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                        Text(
+                            text = "+ Add Step",
+                            color = Color.Gray,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
             }
         }
     }
 }
 
+@Composable
+fun FloatingRoutineMenu() {
+
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+
+        // MENU
+        AnimatedVisibility(
+            visible = expanded,
+            enter = slideInVertically { it / 2 } + fadeIn(),
+            exit = slideOutVertically { it / 2 } + fadeOut(),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 20.dp, bottom = 90.dp)
+        ) {
+
+            Column(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(Color.White)
+                    .border(
+                        1.dp,
+                        Color(0xFFEAEAEA),
+                        RoundedCornerShape(18.dp)
+                    )
+                    .width(210.dp)
+            ) {
+
+                FloatingMenuItem("Add Entry")
+                FloatingMenuItem("Edit Routine")
+                FloatingMenuItem("Reset Day")
+            }
+        }
+
+        // FAB
+        FloatingActionButton(
+            onClick = {
+                expanded = !expanded
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(20.dp),
+            containerColor = Color.Black,
+            contentColor = Color.White,
+            shape = CircleShape
+        ) {
+
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null
+            )
+        }
+    }
+}
 
 @Composable
-fun DropdownItem(text: String) {
-    Text(
-        text = text,
+fun FloatingMenuItem(text: String) {
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
-        color = Color.Black
-    )
+            .clickable { }
+            .padding(horizontal = 18.dp, vertical = 16.dp)
+    ) {
+
+        Text(
+            text = text,
+            color = Color.Black,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium
+        )
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
